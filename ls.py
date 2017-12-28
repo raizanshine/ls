@@ -34,6 +34,7 @@ parser = argparse.ArgumentParser(
     epilog=EPILOG)
 parser.add_argument('-l', action='store_true', help='use a long listing format')
 parser.add_argument('-a', action='store_true', help='do not ignore entries starting with .')
+parser.add_argument('-d', '--directory', action='store_true', help='list directories themselves, not their contents')
 parser.add_argument(
     '-h', '--human-readable',
     action='store_true',
@@ -73,6 +74,7 @@ def long_format(name, stat):
                                                  mtime,
                                                  name)
 
+
 def short_format(name, stat):
     """
     represents line with short format
@@ -82,6 +84,9 @@ def short_format(name, stat):
 
 def main():
     for entry in os.scandir():
+        if args.directory and entry.is_file():
+            continue
+
         if not args.a and entry.name.startswith('.'):
             continue
 
