@@ -30,9 +30,16 @@ parser = argparse.ArgumentParser(
     Sort entries alphabetically if none of -cftuvSUX nor --sort is specified.
     """,
     usage='ls [OPTION]... [FILE]...',
+    add_help=False,
     epilog=EPILOG)
 parser.add_argument('-l', action='store_true', help='use a long listing format')
 parser.add_argument('-a', action='store_true', help='do not ignore entries starting with .')
+parser.add_argument(
+    '-h', '--human-readable',
+    action='store_true',
+    help='with -l and/or -s, print human readable sizes (e.g., 1K 234M 2G)')
+parser.add_argument(
+    '--help', action='help', help='show this help message and exit')
 args = parser.parse_args()
 
 
@@ -54,9 +61,12 @@ def long_format(name, stat):
     username = getpwuid(stat.st_uid).pw_name
     group = getgrgid(stat.st_gid).gr_name
     permissions = oct(stat.st_mode)[-3:]
-    size = humanize_size(stat.st_size)
+    if args.human_readable:
+        size = humanize_size(stat.st_size)
+    else:
+        size = stat.st_size
     mtime = datetime.datetime.fromtimestamp(stat.st_mtime).strftime('%a %b %d %H:%M')
-    return '{:<8}{:<15}{:<15}{} {}{:<15}'.format(permissions,
+    return '{:<8} {:<15} {:<15} {} {} {:<15}'.format(permissions,
                                                  username,
                                                  group,
                                                  size,
